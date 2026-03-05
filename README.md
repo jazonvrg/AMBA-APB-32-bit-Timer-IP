@@ -1,5 +1,5 @@
 ## Project Overview & Technical Description
-*(Source code is private due to academic/IP restrictions. Below is the detailed architectural and functional breakdown of the design.)*
+*(Source code is private due to IP restrictions. Below is the detailed architectural and functional breakdown of the design.)*
 
 This project implements a highly configurable, 64-bit Timer IP equipped with an AMBA APB (Advanced Peripheral Bus) interface. The architecture is customized based on the Core Local Interruptor (CLINT) module commonly found in industrial RISC-V architectures. It is designed to provide precise timing intervals, manage system delays, and generate hardware interrupts.
 
