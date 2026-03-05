@@ -29,14 +29,8 @@ I designed the RTL logic to support advanced operational modes, moving beyond ba
    * *Solution:* The FSM logic ensures that the halt acknowledge (THCSR.halt_ack) is only asserted safely at the boundary of the current counting operation, preserving the exact phase of the divided clock.
 
 ### Verification & Coverage Results
-`results/`
+[results/](./results/)
 
 To ensure industrial-grade reliability, I developed a complete testbench architecture utilizing a custom APB Bus Functional Model (BFM). 
 
 * Achieved **100% Code Coverage** (Statement, Branch, Expression, Condition, and Toggle) by simulating rigorous corner cases, including randomized wait states and illegal register accesses.
-
-**Block Diagram: APB Timer Architecture**
-![Block Diagram](./results/Block Diagram.txt)
-
-**Logic Diagram: **
-![Logic Diagram](./results/Logic Diagram.txt)
