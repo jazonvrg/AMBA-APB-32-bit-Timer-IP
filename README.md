@@ -35,8 +35,8 @@ To ensure industrial-grade reliability, I developed a complete testbench archite
 
 * Achieved **100% Code Coverage** (Statement, Branch, Expression, Condition, and Toggle) by simulating rigorous corner cases, including randomized wait states and illegal register accesses.
 
-**Waveform: Interrupt Generation & W1C Clearance**
-![Waveform Interrupt](./results/waveform_interrupt.png)
-
 **Block Diagram: APB Timer Architecture**
-![Block Diagram](./results/block_diagram.png)
+![Block Diagram](./results/Block Diagram.txt)
+
+**Logic Diagram: **
+![Logic Diagram](./results/Logic Diagram.txt)
