@@ -37,6 +37,20 @@ During this project, I significantly improved my hardware thinking and debugging
 * **Coverage-Driven Verification:** I learned that verification isn't just about passing tests, but about proving you've tested everything. Analyzing branch and toggle coverage taught me how to find "dead code" in my RTL.
 * **Linux & VIM Power:** Writing and debugging code entirely in a Linux terminal using VIM and Makefiles drastically improved my productivity.
 
+### 📋 Verification Plan (VPLAN) Summary
+
+Instead of uploading a massive Excel sheet, here is a high-level extraction of my VPLAN covering the core scenarios I tested to achieve 100% coverage:
+
+| Item | Sub Item | Method | Pass Condition | Result |
+| :--- | :--- | :---: | :--- | :---: |
+| **Slave Access** | Reset Value Check | Direct | `tim_pready` = 0 for all cases | ✅ PASS |
+| **Slave Access** | Ready Status | Direct | `tim_pready` = 1 (except {psel,penable}=10) | ✅ PASS |
+| **Slave Access** | Read/Write Enable | Direct | `rd_en`/`wr_en` active only on valid APB states | ✅ PASS |
+| **Strobe Access** | Register TCR | Direct | Correct data masking based on `pstrb` | ✅ PASS |
+| **Register Access** | Write/Read PR | Direct | `wdata` matched `rdata` after transactions | ✅ PASS |
+| **Timer Logic** | Counter Increment | Direct | Counter increases correctly per clock/prescaler | ✅ PASS |
+| **Interrupt** | Assert/Clear | Direct | `tim_int` fires at target and clears on write | ✅ PASS |
+
 ### 📊 Verification Results & Artifacts
 
 *(Replace the links below with the actual paths to your images in the `images` folder)*
