@@ -1,36 +1,59 @@
-## Project Overview & Technical Description
-*(Source code is private due to IP restrictions. Below is the detailed architectural and functional breakdown of the design.)*
+# ⏱️ APB-Based Timer IP
 
-This project implements a highly configurable, 64-bit Timer IP equipped with an AMBA APB (Advanced Peripheral Bus) interface. The architecture is customized based on the Core Local Interruptor (CLINT) module commonly found in industrial RISC-V architectures. It is designed to provide precise timing intervals, manage system delays, and generate hardware interrupts.
+An APB-compliant Timer IP built from scratch with programmable control registers, prescalers, and interrupt generation logic. I built this side project to deeply understand the AMBA APB protocol and the coverage-driven verification flow. My main focus was on achieving 100% functional and code coverage.
 
-### Key Features & Implementation Details
-I designed the RTL logic to support advanced operational modes, moving beyond basic counting capabilities:
+### 📦 Technologies
 
-* **Advanced APB Slave Interface:**
-    * Fully compliant with the APB protocol, supporting a 12-bit address space and 32-bit data transfers (TDR0, TDR1, TCMP0, TCMP1, etc.).
-    * **Byte Access Support:** Implemented logic to allow the bus master to access individual bytes within the 32-bit registers, utilizing the PSTRB signal.
-    * **Wait States & Error Handling:** Engineered the interface to support 1-cycle wait states (PREADY manipulation) to optimize timing closure. Robust error handling (PSLVERR) is implemented to block illegal writes (e.g., modifying divisor values while the timer is active).
-* **64-bit Count-up Mechanism:**
-    * Features a 64-bit counter that can operate at the core system clock frequency or be dynamically divided (up to /256) via the TCR.div_val configuration.
-    * Hardware-automated reset: When timer_en transitions from High to Low, the counter automatically clears its internal states back to the initial values without requiring a software reset.
-* **Hardware Maskable Interrupts:**
-    * Generates level-triggered interrupts (tim_int) when the 64-bit counter perfectly matches the 64-bit programmed compare value (TCMP1 & TCMP0).
-    * Implemented a strict "Write 1 to Clear" (W1C) mechanism for the interrupt status register (TISR.int_st) to prevent accidental clearing of pending interrupts.
-* **Debug / Halted Mode Integration:**
-    * Designed a synchronization mechanism to safely halt the 64-bit counter when the system enters debug mode (triggered by the external dbg_mode pin and internal THCSR.halt_req).
-    * Ensured that upon resuming from a halted state, the timer maintains its exact counting period without losing clock cycles.
+* **RTL Design:** Verilog
+* **Protocol:** AMBA APB
+* **Verification:** QuestaSim, ModelSim
+* **Environment & OS:** Linux, VIM
+* **Methodology:** Coverage-Driven Verification, VPLAN, Testcase Lists (pat.list)
 
-### Design Challenges & Solutions
-1. **Managing 64-bit Data on a 32-bit APB Bus:**
-   * *Challenge:* The APB bus is 32-bit, meaning the 64-bit counter (TDR1:TDR0) and compare registers (TCMP1:TCMP0) must be accessed in two separate transactions. This could lead to a race condition where a timer interrupt fires erroneously between the writing of the lower and upper 32 bits.
-   * *Solution:* Implemented an internal shadow register/buffering mechanism to ensure that the 64-bit compare value is only updated and evaluated when both 32-bit halves are completely written.
-2. **Handling Corner Cases in Debug Mode:**
-   * *Challenge:* Stopping the counter abruptly when dbg_mode asserts could cause glitches if the timer is in the middle of a divided clock cycle.
-   * *Solution:* The FSM logic ensures that the halt acknowledge (THCSR.halt_ack) is only asserted safely at the boundary of the current counting operation, preserving the exact phase of the divided clock.
+### ⚙️ IP Features
 
-### Verification & Coverage Results
-[results/](./results/)
+Here's what this Timer IP can do:
 
-To ensure industrial-grade reliability, I developed a complete testbench architecture utilizing a custom APB Bus Functional Model (BFM). 
+* **APB Protocol Interface:** Fully compliant with the AMBA APB standard for read/write register operations.
+* **Programmable Prescaler:** Allows scaling of the input clock to generate various timer tick rates.
+* **Interrupt Generation:** Generates a stable interrupt signal when the timer reaches zero or a target value.
+* **Control Registers:** Configurable registers to start, stop, and clear the timer on the fly.
 
-* Achieved **100% Code Coverage** (Statement, Branch, Expression, Condition, and Toggle) by simulating rigorous corner cases, including randomized wait states and illegal register accesses.
+### 🦉 The Process
+
+I started by analyzing the specification and drawing the hardware architecture. Then, I wrote the RTL code in Verilog, ensuring the logic was synthesizable and clean. 
+
+Next, I focused heavily on the verification phase. Instead of writing random tests, I established a comprehensive **Verification Plan (VPLAN)** mapping out all possible scenarios. 
+
+To make testing efficient, I developed an automated Testbench environment. I created a Testcase List (`pat.list`) to run regression testing overnight. I used QuestaSim to simulate the design, debug waveforms, and track coverage metrics. 
+
+Every time I found a bug through the waveform, I traced it back to the RTL, fixed it, and re-ran the regression. Finally, I kept adding edge-case scenarios until I hit the golden metric: 100% Code Coverage across the board with zero mismatches against the Golden Model.
+
+### 📚 What I Learned
+
+During this project, I significantly improved my hardware thinking and debugging skills:
+
+* **AMBA Protocols:** I deeply understood the handshaking mechanism of the APB protocol (PSEL, PENABLE, PREADY) and how to design bus interfaces.
+* **Coverage-Driven Verification:** I learned that verification isn't just about passing tests, but about proving you've tested everything. Analyzing branch and toggle coverage taught me how to find "dead code" in my RTL.
+* **Linux & VIM Power:** Writing and debugging code entirely in a Linux terminal using VIM and Makefiles drastically improved my productivity.
+
+### 📊 Verification Results & Artifacts
+
+*(Replace the links below with the actual paths to your images in the `images` folder)*
+
+**1. Architecture Block Diagram**
+![Block Diagram](images/block_diagram.png)
+
+**2. Simulation Waveform (QuestaSim)**
+![Waveform](images/waveform.png)
+*Snippet showing the APB read/write transactions and interrupt firing.*
+
+**3. Code Coverage Report (100%)**
+![Coverage Report](images/coverage.png)
+*Achieved 100% in Statement, Branch, Expression, Condition, and Toggle coverage.*
+
+### 💭 How can it be improved?
+
+* Upgrade the interface from APB to AHB-Lite for faster burst transactions.
+* Implement a Watchdog mode for system reset capabilities.
+* Migrate the Verilog testbench to a standard UVM (Universal Verification Methodology) environment.
